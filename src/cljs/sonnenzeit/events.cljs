@@ -28,7 +28,25 @@
   (fn
     [db [_ response]]
     (js/console.log "bad response!!")
-    (assoc db :ajax-status "fail")))    ;; note: it needs an assoc to work. why?
+    (assoc db :status "fail")))    ;; note: it needs an assoc to work. why?
+
+
+(defn process-geolocation [position]
+  ; (def longitude (.-longitude js/position.coords))
+  ; (def latitude (.-latitude js/position.coords))
+  (.log js/console "geolocation success")
+)
+
+(re-frame/reg-event-db
+  :request-geolocation
+  (fn
+    [db [_response]]
+    (.getCurrentPosition js/navigator.geolocation.
+      process-geolocation
+      #(.log js/console "geolocation failed")
+    )
+    (assoc db :status "requested geolocation")
+  ))
 
 
 ;; -- Domino 1 - Event Dispatch -----------------------------------------------
