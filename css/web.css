@@ -1,0 +1,18 @@
+html {
+  min-height: 100%; }
+
+body {
+  background: #222222;
+  font-family: monospace;
+  font-size: 16px;
+  color: black;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#32e0cf+0,f2c074+50,ea7687+58,503a78+77 */
+  background: #32e0cf;
+  background: -moz-linear-gradient(top, #32e0cf 0%, #f2c074 50%, #ea7687 58%, #503a78 77%);
+  background: -webkit-linear-gradient(top, #32e0cf 0%, #f2c074 50%, #ea7687 58%, #503a78 77%);
+  background: linear-gradient(to bottom, #32e0cf 0%, #f2c074 50%, #ea7687 58%, #503a78 77%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#32e0cf', endColorstr='#503a78',GradientType=0 );
+  background-attachment: fixed; }
+
+div {
+  margin: 20px auto; }
