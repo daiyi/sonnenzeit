@@ -30,6 +30,13 @@
   (let [name (re-frame/subscribe [:name])]
     (fn []
       [:div
-        [:h4 @name]
-        [clock]
-        [sunset]])))
+        [:div
+          [:h4 @name]
+          [clock]
+          [sunset]
+        ]
+        [:div
+          [:button {:on-click #(re-frame/dispatch [:request-geolocation])} "loc?"]
+        ]
+      ]
+    )))
