@@ -12,6 +12,12 @@ see application state:
 re-frame.db/app-db
 ```
 
+build:
+```
+lein clean
+lein sass once
+lein cljsbuild once min
+```
 
 #### next up
 * request geolocation (lat, lng) from browser

@@ -20,8 +20,9 @@
     [db [_ response]]           ;; destructure the response from the event vector
     (-> db
         (assoc :data (js->clj response))
-        (assoc :sunset-time (:sunset (:results (js->clj response)))
-          ))))
+        (assoc :sunrise-time (:sunrise (:results (js->clj response))))
+        (assoc :sunset-time (:sunset (:results (js->clj response))))
+          )))
 
 (re-frame/reg-event-db
   :bad-response
@@ -32,9 +33,9 @@
 
 
 (defn process-geolocation [position]
-  ; (def longitude (.-longitude js/position.coords))
-  ; (def latitude (.-latitude js/position.coords))
-  (.log js/console "geolocation success")
+  (def longitude (.-longitude js/position.coords))
+  (def latitude (.-latitude js/position.coords))
+  (.log js/console "geolocation success" position)
 )
 
 (re-frame/reg-event-db
@@ -43,9 +44,18 @@
     [db [_response]]
     (.getCurrentPosition js/navigator.geolocation.
       process-geolocation
-      #(.log js/console "geolocation failed")
+      (re-frame/dispatch [:status-update "geolocation failed"])
     )
-    (assoc db :status "requested geolocation")
+    (.log js/console "requesting geolocation")
+    (assoc db :status "requesting geolocation")
+  ))
+
+(re-frame/reg-event-db
+  :status-update
+  (fn
+    [db [_ new-status]]
+    (.log js/console "updating status to " new-status)
+    (assoc db :status new-status)
   ))
 
 
