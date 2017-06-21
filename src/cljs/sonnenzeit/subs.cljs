@@ -31,3 +31,9 @@
   (fn [db _]
     (-> db
       :status)))
+
+(re-frame/reg-sub
+  :geolocation-subscription
+  (fn [db _]
+    (-> db
+      :geolocation)))

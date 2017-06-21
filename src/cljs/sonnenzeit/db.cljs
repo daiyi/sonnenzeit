@@ -7,4 +7,5 @@
    :sunrise-time "2017-06-17T00:00:00+00:00" ;; todo better default
    :sunset-time "2017-06-17T00:00:00+00:00" ;; todo better default
    :status "waiting..."
-   :nothing nil})
+   :nothing nil
+   :geolocation {:coords {:latitude -51.0001666 :longitude -73.1827937} :timestamp 1498050678956}})

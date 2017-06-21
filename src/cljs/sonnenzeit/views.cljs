@@ -4,7 +4,12 @@
 
 (defn status
   []
-  [:div @(re-frame/subscribe [:status-subscription])])
+  [:div.info @(re-frame/subscribe [:status-subscription])])
+
+(defn geolocation
+  []
+  [:div.info (-> @(re-frame/subscribe [:geolocation-subscription])
+            .toString)])
 
 (defn clock
   []
@@ -54,27 +59,33 @@
   [:div.sparkle-wrapper {:style {:width "12px" :height "10px" :bottom bottom :left left}}
     [proto-sparkle]])
 
+(defn sparkle-scape []
+  [:div
+    [sparkle 20 10]
+    [sparkle 0 "40%"]
+    [sparkle -10 "30%"]
+    [sparkle 40 "33%"]
+    [sparkle 90 "70%"]
+    [sparkle 10 "80%"]
+    [sparkle 130 "84%"]])
+
 (defn main-panel
   []
   (let [name (re-frame/subscribe [:name-subscription])]
     (fn []
       [:div.page
-        [sparkle 20 10]
-        [sparkle 0 "40%"]
-        [sparkle -10 "30%"]
-        [sparkle 40 "33%"]
-        [sparkle 90 "70%"]
-        [sparkle 10 "80%"]
-        [sparkle 130 "84%"]
+        [sparkle-scape]
         [:div.content
           [:h4 @name]
-          [status]
           [clock]
           [sunrise]
           [sunset]
-          ; [:div
-          ;   [:button {:on-click #(re-frame/dispatch [:request-geolocation])} "loc?"]]
-          ]
+          [:p "_"]
+          [:div
+            [:a.button {:on-click #(re-frame/dispatch [:request-geolocation])} "request geoloc?"]]
+          [status]
+          [geolocation]
+        ]
         [:div.sundial
           [shape]]
       ]

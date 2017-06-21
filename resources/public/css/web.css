@@ -36,3 +36,17 @@ body {
   height: 100%;
   left: 50%;
   margin-left: -50%; }
+
+.button {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px black solid;
+  padding: 0.2em; }
+  .button:hover {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0); }
+
+.info {
+  font-size: 0.8em;
+  text-transform: uppercase; }

@@ -18,6 +18,7 @@
   :process-response
   (fn
     [db [_ response]]           ;; destructure the response from the event vector
+    (.log js/console "suntimes success" response)
     (-> db
         (assoc :data (js->clj response))
         (assoc :sunrise-time (:sunrise (:results (js->clj response))))
@@ -28,13 +29,13 @@
   :bad-response
   (fn
     [db [_ response]]
-    (js/console.log "bad response!!")
+    (js/console.log "bad response!!" response)
     (assoc db :status "fail")))    ;; note: it needs an assoc to work. why?
 
 
 (defn process-geolocation [position]
-  (def longitude (.-longitude js/position.coords))
-  (def latitude (.-latitude js/position.coords))
+  ; (def longitude (.-longitude js/position.coords))
+  ; (def latitude (.-latitude js/position.coords))
   (.log js/console "geolocation success" position)
 )
 
@@ -43,8 +44,11 @@
   (fn
     [db [_response]]
     (.getCurrentPosition js/navigator.geolocation.
-      process-geolocation
-      (re-frame/dispatch [:status-update "geolocation failed"])
+      ; #(assoc db :geolocation %)
+      ; #(.log js/console "geolocation success" %)
+      ; #(.log js/console (clj->js db))
+      #(re-frame/dispatch [:geolocation-success (js->clj %)])
+      #(re-frame/dispatch [:geolocation-fail (js->clj %)])
     )
     (.log js/console "requesting geolocation")
     (assoc db :status "requesting geolocation")
@@ -58,6 +62,24 @@
     (assoc db :status new-status)
   ))
 
+(re-frame/reg-event-db
+  :geolocation-fail
+  (fn
+    [db [_]]
+    (re-frame/dispatch [:status-update "geolocation failed"])
+    (re-frame/dispatch [:request-suntimes])
+    (assoc db :geolocation {:coords {:latitude -51.0001666 :longitude -73.1827937} :status "failed"})
+  ))
+
+(re-frame/reg-event-db
+  :geolocation-success
+  (fn
+    [db [_ loc]]
+    (.log js/console "updating geolocation to " loc)
+    (re-frame/dispatch [:status-update "geolocation success!!"])
+    (re-frame/dispatch [:request-suntimes])
+    (assoc db :geolocation loc)
+  ))
 
 ;; -- Domino 1 - Event Dispatch -----------------------------------------------
 ;; note: does this belong here??
@@ -77,15 +99,19 @@
 ;; Talking to servers! ----------------------------------
 
 (reg-event-fx        ;; from day8.re-frame.http-fx
-  :request-sunset        ;; <-- the event id
+  :request-suntimes        ;; <-- the event id
   (fn                ;; <-- the handler function
     [{db :db} _]     ;; <-- 1st argument is coeffect, from which we extract db
+
+    (def lat (-> db :geolocation :coords :latitude))
+    (def lng (-> db :geolocation :coords :longitude))
+    ; (def lng (.-longitude js/position.coords))
 
     ;; we return a map of (side) effects
     {:http-xhrio {:method          :get
                   :uri             "https://api.sunrise-sunset.org/json"
                   :format          (ajax/json-request-format)
-                  :params          {:lat "52.499357" :lng "-13.421163" :formatted "0"}
+                  :params          {:lat lat :lng lng :formatted "0"}
                   :response-format (ajax/json-response-format {:keywords? true})
                   :on-success      [:process-response]
                   :on-failure      [:bad-response]}
