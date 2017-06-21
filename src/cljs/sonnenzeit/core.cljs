@@ -20,5 +20,6 @@
 (defn ^:export init []
   (re-frame/dispatch-sync [:initialize-db])
   (re-frame/dispatch [:request-sunset])
+  (re-frame/dispatch [:request-geolocation])
   (dev-setup)
   (mount-root))

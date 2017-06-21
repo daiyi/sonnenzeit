@@ -17,13 +17,19 @@ body {
   background-attachment: fixed; }
 
 .page {
-  position: relative;
   height: 100%; }
 
 .content {
+  position: relative;
   margin: 20px; }
   .content div {
     margin: 10px 0; }
+
+.sparkle {
+  width: 100%; }
+
+.sparkle-wrapper {
+  position: absolute; }
 
 .sundial {
   position: absolute;
