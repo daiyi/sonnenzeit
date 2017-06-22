@@ -15,35 +15,76 @@
   []
   [:div
     [:em "currently "]
-    (-> @(re-frame/subscribe [:time-subscription])
-       .toTimeString
-       (clojure.string/split " ")
-       first)])
+    @(re-frame/subscribe [:time-subscription])])
 
 (defn sunrise
  []
  [:div
    [:em "sunrise "]
-   (-> @(re-frame/subscribe [:sunrise-time-subscription])
-     (clojure.string/split "T")
-     last
-     (clojure.string/split "+")
-     first)])
+   @(re-frame/subscribe [:sunrise-time-subscription])])
 
 (defn sunset
   []
   [:div
     [:em "sunset "]
-    (-> @(re-frame/subscribe [:sunset-time-subscription])
-      (clojure.string/split "T")
-      last
-      (clojure.string/split "+")
-      first)])
+    @(re-frame/subscribe [:sunset-time-subscription])])
+
+(defn get-theta
+  [hour]
+  (* hour 2 (/ Math/PI 24)))
+
+(defn get-clock-point-now
+  [hour]
+  {:cx (* 200 (Math/cos (get-theta hour))) :cy (* 200 (Math/sin (get-theta hour))) :r 10 :stroke "none" :fill "#602BA6"})
+
+(defn get-clock-point
+  [hour]
+  {:cx (* 200 (Math/cos (get-theta hour))) :cy (* 200 (Math/sin (get-theta hour))) :r 10 :stroke "none" :fill "white"})
+
+(defn get-clock-tick
+  [hour]
+  {:cx (* 200 (Math/cos (get-theta hour))) :cy (* 200 (Math/sin (get-theta hour))) :r 3 :stroke "none" :fill "white"})
+
+(defn get-hour-from-time
+  [time]
+  (-> time
+      (clojure.string/split ":")
+      first))
 
 (defn shape
   []
-  [:svg {:viewBox "-300 -300 600 600" :preserveAspectRatio "xMidYMid meet"}
-    [:circle {:cx 0 :cy 0 :r 200 :stroke "white" :stroke-width 2 :fill "none"}]]
+  [:svg.clock {:viewBox "-300 -300 600 600" :preserveAspectRatio "xMidYMid meet"}
+    [:circle (get-clock-tick 0)]
+    [:circle (get-clock-tick 1)]
+    [:circle (get-clock-tick 2)]
+    [:circle (get-clock-tick 3)]
+    [:circle (get-clock-tick 4)]
+    [:circle (get-clock-tick 5)]
+    [:circle (get-clock-tick 6)]
+    [:circle (get-clock-tick 7)]
+    [:circle (get-clock-tick 8)]
+    [:circle (get-clock-tick 9)]
+    [:circle (get-clock-tick 10)]   ;; halp
+    [:circle (get-clock-tick 11)]
+    [:circle (get-clock-tick 12)]
+    [:circle (get-clock-tick 13)]
+    [:circle (get-clock-tick 14)]
+    [:circle (get-clock-tick 15)]
+    [:circle (get-clock-tick 16)]
+    [:circle (get-clock-tick 17)]
+    [:circle (get-clock-tick 18)]
+    [:circle (get-clock-tick 19)]
+    [:circle (get-clock-tick 20)]
+    [:circle (get-clock-tick 21)]
+    [:circle (get-clock-tick 22)]
+    [:circle (get-clock-tick 23)]
+    [:circle (get-clock-point
+               (get-hour-from-time @(re-frame/subscribe [:sunrise-time-subscription])))]
+    [:circle (get-clock-point
+               (get-hour-from-time @(re-frame/subscribe [:sunset-time-subscription])))]
+    [:circle (get-clock-point-now
+               (get-hour-from-time @(re-frame/subscribe [:time-subscription])))]
+  ]
 )
 
 (defn proto-sparkle []
@@ -80,7 +121,7 @@
           [clock]
           [sunrise]
           [sunset]
-          [:p "_"]
+          "_"
           [:div
             [:a.button {:on-click #(re-frame/dispatch [:request-geolocation])} "request geoloc?"]]
           [status]

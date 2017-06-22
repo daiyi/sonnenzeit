@@ -12,18 +12,35 @@
 (re-frame/reg-event-db                 ;; usage:  (dispatch [:timer a-js-Date])
   :timer                         ;; every second an event of this kind will be dispatched
   (fn [db [_ new-time]]          ;; note how the 2nd parameter is destructured to obtain the data value
-    (assoc db :time new-time)))  ;; compute and return the new application state
+    (def clock-time (-> new-time
+       .toTimeString
+       (clojure.string/split " ")
+       first))
+    (assoc db :time clock-time)))  ;; compute and return the new application state
 
 (re-frame/reg-event-db
   :process-response
   (fn
     [db [_ response]]           ;; destructure the response from the event vector
-    (.log js/console "suntimes success" response)
+    (def results (:results (js->clj response)))
+    (def sunrise (-> results :sunrise
+                     (clojure.string/split "T")
+                     last
+                     (clojure.string/split "+")
+                     first))
+    (def sunset (-> results :sunset
+                    (clojure.string/split "T")
+                    last
+                    (clojure.string/split "+")
+                    first))
+
+    (.log js/console "suntimes success" response sunrise sunset)
+
     (-> db
-        (assoc :data (js->clj response))
-        (assoc :sunrise-time (:sunrise (:results (js->clj response))))
-        (assoc :sunset-time (:sunset (:results (js->clj response))))
-          )))
+      (assoc :data response)
+      (assoc :sunrise-time sunrise)
+      (assoc :sunset-time sunset)
+      )))
 
 (re-frame/reg-event-db
   :bad-response
@@ -68,7 +85,7 @@
     [db [_]]
     (re-frame/dispatch [:status-update "geolocation failed"])
     (re-frame/dispatch [:request-suntimes])
-    (assoc db :geolocation {:coords {:latitude -51.0001666 :longitude -73.1827937} :status "failed"})
+    (assoc db :geolocation {:coords {:latitude 52.503745 :longitude 13.4229089} :status "failed"})
   ))
 
 (re-frame/reg-event-db
