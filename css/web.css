@@ -50,3 +50,6 @@ body {
 .info {
   font-size: 0.8em;
   text-transform: uppercase; }
+
+.clock {
+  transform: scaleY(-1) rotateZ(90deg) scaleY(-1); }
