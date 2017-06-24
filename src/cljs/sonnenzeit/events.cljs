@@ -22,19 +22,18 @@
   :process-response
   (fn
     [db [_ response]]           ;; destructure the response from the event vector
-    (def results (:results (js->clj response)))
-    (def sunrise (-> results :sunrise
+    (def sunrise (-> response :results :sunrise
                      (clojure.string/split "T")
                      last
                      (clojure.string/split "+")
                      first))
-    (def sunset (-> results :sunset
+    (def sunset (-> response :results :sunset
                     (clojure.string/split "T")
                     last
                     (clojure.string/split "+")
                     first))
 
-    (.log js/console "suntimes success" response sunrise sunset)
+    (.log js/console "suntimes success" sunrise sunset)
 
     (-> db
       (assoc :data response)
@@ -61,11 +60,9 @@
   (fn
     [db [_response]]
     (.getCurrentPosition js/navigator.geolocation.
-      ; #(assoc db :geolocation %)
-      ; #(.log js/console "geolocation success" %)
-      ; #(.log js/console (clj->js db))
-      #(re-frame/dispatch [:geolocation-success (js->clj %)])
-      #(re-frame/dispatch [:geolocation-fail (js->clj %)])
+      ;; NOTE use :keywordize-keys option for converting objects or json, omg
+      #(re-frame/dispatch [:geolocation-success (js->clj % :keywordize-keys true)])
+      #(re-frame/dispatch [:geolocation-fail (js->clj % :keywordize-keys true)])
     )
     (.log js/console "requesting geolocation")
     (assoc db :status "requesting geolocation")
@@ -92,7 +89,6 @@
   :geolocation-success
   (fn
     [db [_ loc]]
-    (.log js/console "updating geolocation to " loc)
     (re-frame/dispatch [:status-update "geolocation success!!"])
     (re-frame/dispatch [:request-suntimes])
     (assoc db :geolocation loc)
